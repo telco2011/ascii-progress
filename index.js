@@ -456,7 +456,9 @@ ProgressBar.prototype.terminate = function () {
   }
 
   this.callback && this.callback(this);
-  this.cursor.moveTo(this.savePos.row, this.savePos.col);
+  if (this.savePos) {
+    this.cursor.moveTo(this.savePos.row, this.savePos.col);
+  }
 };
 
 
