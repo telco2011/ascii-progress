@@ -1,16 +1,16 @@
-var ansi         = require('ansi.js');
-var endWith      = require('end-with');
-var startWith    = require('start-with');
+var ansi = require('ansi.js');
+var endWith = require('end-with');
+var startWith = require('start-with');
 var getCurosrPos = require('get-cursor-position');
 var newlineEvent = require('on-new-line');
 
-var stream      = process.stdout;
-stream.rows     = stream.rows || 40;
-stream.columns  = stream.columns || 80;
+var stream = process.stdout;
+stream.rows = stream.rows || 40;
+stream.columns = stream.columns || 80;
 
 var placeholder = '\uFFFC';
-var rendering   = false;
-var instances   = [];
+var rendering = false;
+var instances = [];
 
 function beginUpdate() {
   rendering = true;
@@ -33,7 +33,7 @@ stream.on('before:newlines', function (count) {
   }
 
   var current = getCurosrPos.sync();
-  if(!current){
+  if (!current) {
     return;
   }
 
@@ -90,10 +90,10 @@ function ProgressBar(options) {
 
   options = options || {};
 
-  this.cursor  = ansi(stream);
-  this.total   = options.total || 100;
+  this.cursor = ansi(stream);
+  this.total = options.total || 100;
   this.current = options.current || 0;
-  this.width   = options.width || 60;
+  this.width = options.width || 60;
   this.fixedWidth = options.fixedWidth;
 
   if (typeof this.width === 'string') {
@@ -144,7 +144,7 @@ ProgressBar.prototype.tick = function (delta, tokens) {
 
   if (type === 'object') {
     tokens = delta;
-    delta  = 1;
+    delta = 1;
   } else if (type === 'undefined') {
     delta = 1;
   } else {
@@ -170,7 +170,7 @@ ProgressBar.prototype.tick = function (delta, tokens) {
 ProgressBar.prototype.update = function (ratio, tokens) {
 
   var completed = Math.floor(ratio * this.total);
-  var delta     = completed - this.current;
+  var delta = completed - this.current;
 
   this.tick(delta, tokens);
 };
@@ -181,8 +181,8 @@ ProgressBar.prototype.compile = function (tokens) {
 
   ratio = Math.min(Math.max(ratio, 0), 1);
 
-  var chars   = this.chars;
-  var schema  = this.schema;
+  var chars = this.chars;
+  var schema = this.schema;
   var percent = ratio * 100;
   var elapsed = new Date - this.start;
 
@@ -209,8 +209,8 @@ ProgressBar.prototype.compile = function (tokens) {
     }
   }
 
-  var raw   = bleach(output);
-  var cols  = process.stdout.columns;
+  var raw = bleach(output);
+  var cols = process.stdout.columns;
   var width = this.width;
 
   width = width < 1 ? cols * width : width;
@@ -220,9 +220,9 @@ ProgressBar.prototype.compile = function (tokens) {
 
   var length = Math.round(width * ratio);
   var filled = repeatChar(length, chars.filled);
-  var blank  = repeatChar(width - length, chars.blank);
+  var blank = repeatChar(width - length, chars.blank);
 
-  raw    = combine(raw, filled, blank, true);
+  raw = combine(raw, filled, blank, true);
   output = combine(output, filled, blank, false);
 
   // without color and font styles
@@ -270,7 +270,7 @@ ProgressBar.prototype.render = function (output) {
     this.cursor.moveTo(current.row, current.col);
   }
 
-  this.output   = output;
+  this.output = output;
   this.rendered = true;
 
   endUpdate();
@@ -279,7 +279,7 @@ ProgressBar.prototype.render = function (output) {
 ProgressBar.prototype.colorize = function (output) {
 
   var charsLeft = process.stdout.columns - 1;
-  function writeChars (chars) {
+  function writeChars(chars) {
     if (!charsLeft) {
       return;
     }
@@ -288,8 +288,8 @@ ProgressBar.prototype.colorize = function (output) {
     charsLeft = Math.max(0, charsLeft - chars.length);
   }
 
-  var cursor  = this.cursor;
-  var parts   = output.split(/(\.[A-Za-z]+)/g);
+  var cursor = this.cursor;
+  var parts = output.split(/(\.[A-Za-z]+)/g);
   var content = '';
   var matches = [];
 
@@ -300,8 +300,8 @@ ProgressBar.prototype.colorize = function (output) {
     //console.log(content)
     //console.log(matches)
 
-    var hasFg    = false;
-    var hasBg    = false;
+    var hasFg = false;
+    var hasBg = false;
     var gradient = null;
 
     matches.forEach(function (match) {
@@ -313,8 +313,8 @@ ProgressBar.prototype.colorize = function (output) {
 
       var host = match.isBg
         ? cursor.bg : match.isFont
-        ? cursor.font
-        : cursor.fg;
+          ? cursor.font
+          : cursor.fg;
 
       if (match.isBg) {
         hasBg = true;
@@ -338,8 +338,8 @@ ProgressBar.prototype.colorize = function (output) {
 
           var color = i === 0
             ? color1 : i === l - 1
-            ? color2
-            : interpolate(color1, color2, (i + 1) / l);
+              ? color2
+              : interpolate(color1, color2, (i + 1) / l);
 
           cursor.fg.rgb(color.r, color.g, color.b);
           writeChars(content[i]);
@@ -373,7 +373,7 @@ ProgressBar.prototype.colorize = function (output) {
 
   for (var i = 0, l = parts.length; i < l; i++) {
 
-    var part  = parts[i];
+    var part = parts[i];
     var match = null;
 
     if (!part) {
@@ -487,7 +487,7 @@ function ucFirst(str) {
 }
 
 function repeatChar(count, char) {
-  return new Array(count + 1).join(char);
+  return new Array(parseInt(count, 10) + 1).join(char);
 }
 
 function parseMethod(cursor, str) {
@@ -516,7 +516,7 @@ function parseColor(cursor, str) {
 
     var method = match[0];
     var suffix = str.substr(method.length);
-    var isBg   = startWith(method, 'bg');
+    var isBg = startWith(method, 'bg');
 
     if (isBg) {
       method = lcFirst(method.substr(2));
@@ -638,8 +638,8 @@ function combine(output, filled, blank, bare) {
   var bar = filled + blank;
 
   if (!bare) {
-    bar    = bar || placeholder;
-    blank  = blank || placeholder;
+    bar = bar || placeholder;
+    blank = blank || placeholder;
     filled = filled || placeholder;
   }
 
