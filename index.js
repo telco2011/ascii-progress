@@ -3,6 +3,7 @@ var endWith = require('end-with');
 var startWith = require('start-with');
 var getCurosrPos = require('get-cursor-position');
 var newlineEvent = require('on-new-line');
+var humanize = require('humanize');
 
 var stream = process.stdout;
 stream.rows = stream.rows || 40;
@@ -22,6 +23,10 @@ function endUpdate() {
 
 function isUpdating() {
   return rendering === true;
+}
+
+function makeForHumans(val) {
+  return humanize.filesize(val);
 }
 
 newlineEvent(stream);
@@ -111,6 +116,8 @@ function ProgressBar(options) {
     filled: options.filled || '▇'
   };
 
+  this.humanize = options.humanize || false;
+
   // callback on completed
   this.callback = options.callback;
 
@@ -195,8 +202,8 @@ ProgressBar.prototype.compile = function (tokens) {
   }
 
   var output = schema
-    .replace(/:total/g, this.total)
-    .replace(/:current/g, this.current)
+    .replace(/:total/g, this.humanize ? makeForHumans(this.total) : this.total)
+    .replace(/:current/g, this.humanize ? makeForHumans(this.current) : this.current)
     .replace(/:elapsed/g, formatTime(elapsed))
     .replace(/:eta/g, eta)
     .replace(/:percent/g, toFixed(percent, 0) + '%');
